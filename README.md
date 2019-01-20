@@ -7,9 +7,11 @@ A simple command-line tool to manage
 to display the current user identity. It can also get temporary credentials and inject them into a new shell process
 as [CLI environment variables](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html).
 
-To see a full list of options, use the `-h` or `--help` command-line option.
+To see a full list of command-line options, use the `-h` or `--help` flag.
 
-## Assume a named role in the same account
+## Use cases
+
+### Assume a named role in the same account
 
 Get the account for the current user identity (which could be set through a
 [named profile](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html))
