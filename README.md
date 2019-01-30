@@ -21,7 +21,7 @@ to assume a named role in that account. Takes an optional
 assuming the role requires MFA.
 
 ```
-aws-identity -r <role-name> [-t token-code]
+aws-identity -r <role-name> [-t <token-code>]
 ```
 
 e.g.
@@ -36,7 +36,7 @@ Spawning subshell for role arn:aws:iam::111122223333:role/admin
 As above but takes the target account number to assume the role in.
 
 ```
-aws-identity -a <account> -r role-name [-t token-code]
+aws-identity -a <account> -r <role-name> [-t <token-code>]
 ```
 
 e.g.
