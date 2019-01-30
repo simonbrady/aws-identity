@@ -15,14 +15,16 @@ import (
 )
 
 // Command-line options
-var account string
-var debug bool
-var duration int64
-var mfaSerial string
-var mfaToken string
-var quiet bool
-var role string
-var sessionName string
+var (
+	account     string
+	debug       bool
+	duration    int64
+	mfaSerial   string
+	mfaToken    string
+	quiet       bool
+	role        string
+	sessionName string
+)
 
 func init() {
 	boolOpts := []struct {
@@ -86,7 +88,7 @@ func newClient() *sts.STS {
 }
 
 // getRoleCreds returns STS credentials from assuming the role given in roleArn.
-func getRoleCreds(client *sts.STS, roleArn string) *sts.Credentials {
+func getRoleCreds(client *sts.STS, roleArn string) (*sts.Credentials, error) {
 	input := new(sts.AssumeRoleInput).
 		SetDurationSeconds(duration).
 		SetRoleArn(roleArn).
@@ -96,22 +98,22 @@ func getRoleCreds(client *sts.STS, roleArn string) *sts.Credentials {
 	}
 	result, err := client.AssumeRole(input)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
-	return result.Credentials
+	return result.Credentials, nil
 }
 
 // getMFACreds returns STS credentials for the current user but in an MFA session.
-func getMFACreds(client *sts.STS) *sts.Credentials {
+func getMFACreds(client *sts.STS) (*sts.Credentials, error) {
 	input := new(sts.GetSessionTokenInput).
 		SetDurationSeconds(duration).
 		SetSerialNumber(mfaSerial).
 		SetTokenCode(mfaToken)
 	result, err := client.GetSessionToken(input)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
-	return result.Credentials
+	return result.Credentials, nil
 }
 
 // spawnSubShell launches a shell for the named principal, injecting the given credentials.
@@ -154,9 +156,17 @@ func main() {
 	switch {
 	case role != "":
 		roleArn := fmt.Sprintf("arn:aws:iam::%s:role/%s", account, role)
-		spawnSubShell("role "+roleArn, getRoleCreds(client, roleArn))
+		creds, err := getRoleCreds(client, roleArn)
+		if err != nil {
+			log.Fatal(err)
+		}
+		spawnSubShell("role "+roleArn, creds)
 	case mfaToken != "":
-		spawnSubShell("user "+*identity.Arn, getMFACreds(client))
+		creds, err := getMFACreds(client)
+		if err != nil {
+			log.Fatal(err)
+		}
+		spawnSubShell("user "+*identity.Arn, creds)
 	default:
 		fmt.Println(*identity.Arn)
 	}
