@@ -131,12 +131,12 @@ func spawnSubShell(principal string, creds *sts.Credentials) {
 }
 
 func main() {
-	log.SetPrefix("aws-get-creds: ")
+	log.SetPrefix("aws-identity: ")
 	log.SetFlags(0)
 	client := newClient()
 
 	// Infer any missing options from the current user's identity
-	identity, err := client.GetCallerIdentity(nil)
+	identity, err := client.GetCallerIdentity(new(sts.GetCallerIdentityInput))
 	if err != nil {
 		log.Fatal(err)
 	}
