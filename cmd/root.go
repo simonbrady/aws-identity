@@ -130,10 +130,18 @@ func getMFACreds(client *sts.STS) (*sts.Credentials, error) {
 
 // spawnSubShell launches a shell for the named principal, injecting the given credentials.
 func spawnSubShell(principal string, creds *sts.Credentials) {
-	if !quiet {
-		fmt.Printf("Spawning subshell for %s\n", principal)
+	shell := "bash"
+	for _, env := range(os.Environ()) {
+		keyval := strings.SplitN(env, "=", 2)
+		if keyval[0] == "SHELL" {
+			shell = keyval[1]
+			break
+		}
 	}
-	cmd := exec.Command("bash", "-i")
+	if !quiet {
+		fmt.Printf("Spawning %s for %s\n", shell, principal)
+	}
+	cmd := exec.Command(shell, "-i")
 	cmd.Stdin, cmd.Stdout, cmd.Stderr = os.Stdin, os.Stdout, os.Stderr
 	cmd.Env = append(os.Environ(),
 		"AWS_ACCESS_KEY_ID="+*creds.AccessKeyId,
