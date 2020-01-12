@@ -14,7 +14,7 @@ import (
 
 var rootCmd = &cobra.Command{
 	Use: "aws-identity",
-	Short: "Manage AWS identity for command-line tools",
+	Short: "Command-line tool to manage STS credentials",
 	Long: `Spawn subshell after assuming role and/or authenticating with MFA.
 
 If no flags are given, print the caller's current AWS identity instead.`,
@@ -146,7 +146,8 @@ func spawnSubShell(principal string, creds *sts.Credentials) {
 	cmd.Env = append(os.Environ(),
 		"AWS_ACCESS_KEY_ID="+*creds.AccessKeyId,
 		"AWS_SECRET_ACCESS_KEY="+*creds.SecretAccessKey,
-		"AWS_SESSION_TOKEN="+*creds.SessionToken)
+		"AWS_SESSION_TOKEN="+*creds.SessionToken,
+	)
 	cmd.Run()
 }
 
