@@ -32,6 +32,28 @@ func check(err error) {
 	}
 }
 
+func main() {
+	var rootCmd = &cobra.Command{
+		Use:   "aws-identity",
+		Short: "Command-line tool to manage STS credentials",
+		Long: `Spawn subshell after assuming role and/or authenticating with MFA.
+
+If no flags are given, print the caller's current AWS identity instead.`,
+		Run: func(cmd *cobra.Command, args []string) {
+			run()
+		},
+	}
+	rootCmd.Flags().StringVarP(&account, "account", "a", "", "Target account, default derived from caller identity")
+	rootCmd.Flags().BoolVarP(&debug, "debug", "D", false, "Enable debugging output")
+	rootCmd.Flags().Int64VarP(&duration, "duration", "d", 3600, "Lifetime of temporary credentials in seconds")
+	rootCmd.Flags().StringVarP(&mfaSerial, "mfa-serial", "m", "", "ARN of MFA device, default derived from caller identity")
+	rootCmd.Flags().StringVarP(&mfaToken, "mfa-token", "t", "", "MFA token code")
+	rootCmd.Flags().BoolVarP(&quiet, "quiet", "q", false, "Minimise output")
+	rootCmd.Flags().StringVarP(&role, "role", "r", "", "Target role name")
+	rootCmd.Flags().StringVarP(&sessionName, "session-name", "n", "", "Session name, default derived from caller identity")
+	check(rootCmd.Execute())
+}
+
 func run() {
 	client := newClient()
 
@@ -128,27 +150,4 @@ func spawnSubShell(principal string, creds *sts.Credentials) {
 		"AWS_SESSION_TOKEN="+*creds.SessionToken,
 	)
 	cmd.Run()
-}
-
-func main() {
-	var rootCmd = &cobra.Command{
-		Use:   "aws-identity",
-		Short: "Command-line tool to manage STS credentials",
-		Long: `Spawn subshell after assuming role and/or authenticating with MFA.
-
-If no flags are given, print the caller's current AWS identity instead.`,
-		Run: func(cmd *cobra.Command, args []string) {
-			run()
-		},
-	}
-	rootCmd.Flags().StringVarP(&account, "account", "a", "", "Target account, default derived from caller identity")
-	rootCmd.Flags().BoolVarP(&debug, "debug", "D", false, "Enable debugging output")
-	rootCmd.Flags().Int64VarP(&duration, "duration", "d", 3600, "Lifetime of temporary credentials in seconds")
-	rootCmd.Flags().StringVarP(&mfaSerial, "mfa-serial", "m", "", "ARN of MFA device, default derived from caller identity")
-	rootCmd.Flags().StringVarP(&mfaToken, "mfa-token", "t", "", "MFA token code")
-	rootCmd.Flags().BoolVarP(&quiet, "quiet", "q", false, "Minimise output")
-	rootCmd.Flags().StringVarP(&role, "role", "r", "", "Target role name")
-	rootCmd.Flags().StringVarP(&sessionName, "session-name", "n", "", "Session name, default derived from caller identity")
-	err := rootCmd.Execute()
-	check(err)
 }
