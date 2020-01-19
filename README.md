@@ -9,6 +9,17 @@ as [CLI environment variables](https://docs.aws.amazon.com/cli/latest/userguide/
 
 To see a full list of command-line options, use the `-h` or `--help` flag.
 
+## Installation
+
+First, [install Go]. Then you can download and build with this one command:
+
+```
+go get github.com/simonbrady/aws-identity
+```
+
+This will also download all required dependencies, and create the binary in your `$GOBIN`
+directory (`$HOME/go/bin` if you haven't explicitly set it).
+
 ## Use cases
 
 ### Assume a named role in the same account
