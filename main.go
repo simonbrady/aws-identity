@@ -23,6 +23,7 @@ var (
 	quiet       bool
 	role        string
 	sessionName string
+	version     bool
 )
 
 func check(err error) {
@@ -51,10 +52,16 @@ If no flags are given, print the caller's current AWS identity instead.`,
 	rootCmd.Flags().BoolVarP(&quiet, "quiet", "q", false, "Minimise output")
 	rootCmd.Flags().StringVarP(&role, "role", "r", "", "Target role name")
 	rootCmd.Flags().StringVarP(&sessionName, "session-name", "n", "", "Session name, default derived from caller identity")
+	rootCmd.Flags().BoolVarP(&version, "version", "v", false, "Show version and exit")
 	check(rootCmd.Execute())
 }
 
 func run() {
+	if version {
+		fmt.Println("aws-identity v1.0.0")
+		return
+	}
+
 	client := newClient()
 
 	// Infer any missing options from the current user's identity
