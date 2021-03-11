@@ -58,7 +58,7 @@ If no flags are given, print the caller's current AWS identity instead.`,
 
 func run() {
 	if version {
-		fmt.Println("aws-identity v1.0.0")
+		fmt.Println("aws-identity v1.0.1")
 		return
 	}
 
