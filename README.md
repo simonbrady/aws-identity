@@ -14,7 +14,7 @@ To see a full list of command-line options, use the `-h` or `--help` flag.
 First, [install Go](https://golang.org/doc/install). Then you can download and build with this one command:
 
 ```
-go get github.com/simonbrady/aws-identity
+go install github.com/simonbrady/aws-identity@latest
 ```
 
 This will also download all required dependencies, and create the binary in your `$GOBIN`
