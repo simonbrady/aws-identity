@@ -39,7 +39,7 @@ e.g.
 
 ```
 $ aws-identity -r admin -t 123456
-Spawning subshell for role arn:aws:iam::111122223333:role/admin
+Spawning /bin/bash for role arn:aws:iam::111122223333:role/admin
 ```
 
 ### Assume a named cross-account role
@@ -54,7 +54,7 @@ e.g.
 
 ```
 $ aws-identity -a 444455556666 -r admin -t 234567
-Spawning subshell for role arn:aws:iam::444455556666:role/admin
+Spawning /bin/bash for role arn:aws:iam::444455556666:role/admin
 ```
 
 ### Authenticate the current user with MFA
@@ -71,7 +71,7 @@ e.g.
 
 ```
 $ aws-identity -t 345678
-Spawning subshell for user arn:aws:iam::111122223333:user/jrh
+Spawning /bin/bash for user arn:aws:iam::111122223333:user/jrh
 ```
 
 This is useful for tools like the [Terraform AWS provider](https://www.terraform.io/docs/providers/aws/)
