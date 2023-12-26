@@ -26,11 +26,18 @@ var (
 	version     bool
 )
 
-func check(err error) {
+func die(err error) {
+	fmt.Println(err)
+	os.Exit(1)
+}
+
+// Generic wrapper for any function with error as its second return type,
+// so the caller doesn't have to worry about error handling.
+func must[T any](retval T, err error) T {
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		die(err)
 	}
+	return retval
 }
 
 func main() {
@@ -53,20 +60,21 @@ If no flags are given, print the caller's current AWS identity instead.`,
 	rootCmd.Flags().StringVarP(&role, "role", "r", "", "Target role name")
 	rootCmd.Flags().StringVarP(&sessionName, "session-name", "n", "", "Session name, default derived from caller identity")
 	rootCmd.Flags().BoolVarP(&version, "version", "v", false, "Show version and exit")
-	check(rootCmd.Execute())
+	if err := rootCmd.Execute(); err != nil {
+		die(err)
+	}
 }
 
 func run() {
 	if version {
-		fmt.Println("aws-identity v1.0.4")
+		fmt.Println("aws-identity v1.0.5")
 		return
 	}
 
 	client := newClient()
 
 	// Infer any missing options from the current user's identity
-	identity, err := client.GetCallerIdentity(new(sts.GetCallerIdentityInput))
-	check(err)
+	identity := must(client.GetCallerIdentity(new(sts.GetCallerIdentityInput)))
 	arn := strings.Split(*identity.Arn, ":")
 	username := strings.Split(arn[5], "/")[1]
 	if account == "" {
@@ -83,12 +91,10 @@ func run() {
 	switch {
 	case role != "":
 		roleArn := fmt.Sprintf("arn:aws:iam::%s:role/%s", account, role)
-		creds, err := getRoleCreds(client, roleArn)
-		check(err)
+		creds := must(getRoleCreds(client, roleArn))
 		spawnSubShell("role "+roleArn, creds)
 	case mfaToken != "":
-		creds, err := getMFACreds(client)
-		check(err)
+		creds := must(getMFACreds(client))
 		spawnSubShell("user "+*identity.Arn, creds)
 	default:
 		fmt.Println(*identity.Arn)
